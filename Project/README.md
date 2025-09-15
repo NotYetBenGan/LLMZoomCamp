@@ -95,5 +95,6 @@ docker exec -it prague_events_chat_app python scripts/ingest_vinegret_to_qdrant.
 
 <div align="center">
    <img src="media/Ask_Example.png">
+   <img src="media/Ask_Example2.png">
 </div> 
 
