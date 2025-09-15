@@ -1,5 +1,7 @@
 # Prague Events Chat
-[Prague picture here]
+<div align="center">
+   <img src="media/Prague_Events_Chat.png" alt="Description" width="500" height="500">
+</div>
 
 ## Project Description
 The Prague Events Chat is an interactive application designed to help users explore and learn about events in Prague. The project combines a knowledge base (Qdrant vector database) and a large language model (LLM) (OpenAI's GPT) to provide accurate and context-aware answers to user queries. By leveraging automated ingestion pipelines, advanced retrieval techniques, and a user-friendly interface, the application ensures a seamless experience for users seeking information about Prague's vibrant cultural and social scene.
@@ -29,21 +31,29 @@ The application features a Streamlit-based user interface, allowing users to int
 
 ## Ingestion Pipeline
 The ingestion pipeline is fully automated using a Python scripts:
-- (web_scraping.py):
-    - scrape blog articles from a [Prague news website](https://www.vinegret.cz/646868/afisha-1) in Russian
-    - extract their content and metadata
-    - translate the content from Russian to English
-    - save the results into JSON files
+- [`web_scraping.py`](https://github.com/NotYetBenGan/LLMZoomCamp/blob/main/Project/scripts/web_scraping.py):
+    - Scrapes blog articles from a [Prague news website](https://www.vinegret.cz/646868/afisha-1) in Russian
+    - Extracts their content and metadata
+    - Translates the content from Russian to English via `gpt-3.5-turbo` model
+    - Saves the results into [`JSON`](https://github.com/NotYetBenGan/LLMZoomCamp/tree/main/Project/data/vinegret_articles/json) 
 
-- (ingest_vinegret_to_qdrant.py):
-
-    - Reads event data from JSON files
+- [`ingest_vinegret_to_qdrant.py`](https://github.com/NotYetBenGan/LLMZoomCamp/blob/main/Project/scripts/ingest_vinegret_to_qdrant.py):
+    - Reads event data from [`JSON`](https://github.com/NotYetBenGan/LLMZoomCamp/tree/main/Project/data/vinegret_articles/json)
     - Filters and processes paragraphs
-    - Embeds the data using OpenAI embeddings
-    - Stores the data in the Qdrant vector database
+    - Embeds the data using `text-embedding-ada-002` embedding model
+        - size = 1536
+        - distance = models.Distance.COSINE
+    - Stores the data in the Qdrant vector database collection `prague_events`
+
+- [`retrieve_and_answer.py`](https://github.com/NotYetBenGan/LLMZoomCamp/blob/main/Project/scripts/retrieve_and_answer.py):
+    - Retrieves relevant information from a Qdrant vector database
+        - Qdrant vector database running at http://qdrant:6333
+    - Formats the `CONTEXT` and the user’s `QUESTION` into a structured prompt
+    - Sends the prompt to `gpt-4o` model
+    - Generates a context-aware answer to a user-provided question 
 
 ## Monitoring
-The project does not currently include monitoring features such as user feedback collection or a dashboard.
+The project does not currently include monitoring features such as user feedback collection or a dashboard. I have plans to apply it after diving deeper in this topic
 
 ## Containerization 
 The entire project is containerized using Docker Compose. Both the Qdrant service and the Streamlit app are included in the docker-compose.yml file, ensuring easy deployment and reproducibility.
@@ -81,5 +91,9 @@ docker exec -it prague_events_chat_app python scripts/ingest_vinegret_to_qdrant.
 
 6. Explore the App
     - Open the Streamlit app in your browser: [Prague Events Chat](http://localhost:8501)
-    - Ask questions about Prague events, and the app will retrieve answers based on the ingested data.
+    - Ask questions about Prague events, and the app will retrieve answers based on the ingested data
+
+<div align="center">
+   <img src="media/Ask_Example.png">
+</div> 
 
